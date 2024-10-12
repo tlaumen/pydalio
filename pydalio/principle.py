@@ -2,8 +2,10 @@ from dataclasses import dataclass
 from typing import Optional
 from itertools import pairwise
 from itertools import combinations
+from pathlib import Path
 
 import typer
+import yaml
 
 @dataclass
 class Option:
@@ -59,3 +61,21 @@ class Principle:
             response: int = typer.prompt(text, type=int)
             valid_response = self._is_response_valid(response)
         return response
+
+def _principle_factory(dict_: dict[str, list[str]]) -> list[Principle]:
+    """Gets principles as keys and options as values of dictionary"""
+    principles: list[Principle] = []
+    for question, options in dict_.items():
+        principles.append(
+            Principle(
+                question=question,
+                options=[Option(id_=i, explanation=expl) for i, expl in enumerate(options, start=1)]
+            )
+        )
+    return principles
+
+def yaml_loader(path: Path) -> list[Principle]:
+    with open(path) as f:
+        dict_ = yaml.safe_load(f)
+    print(dict_)
+    return _principle_factory(dict_)

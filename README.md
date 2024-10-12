@@ -3,11 +3,11 @@ The idea is to pose a number of principle questions to make more informed, ratio
 
 Development track:
 
-[] create cli application basis
-[] create orchestrating logic to run continuously
-[] create sqllite db interface
-[] create generalised principle questions interface
-[] create simple algorithm interface based on database, first guesstimate is linear regression or decision tree algorithm
+[ ] create cli application basis
+[ ] create orchestrating logic to run continuously
+[ ] create sqllite db interface
+[x] create generalised principle questions interface
+[ ] create simple algorithm interface based on database, first guesstimate is linear regression or decision tree algorithm
 
 If you would like to contribute, fork the package (ADD github url) and make a PR.
 For further questions, e-mail to tom_laumen@hotmail.com

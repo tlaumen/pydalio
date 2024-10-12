@@ -1,6 +1,9 @@
-from pydalio.principle import Option, Principle
+from pathlib import Path
 
 import pytest
+
+from pydalio.principle import Option, Principle, yaml_loader
+
 
 option1 = Option(id_=1, explanation="test question 1")
 option2 = Option(id_=2, explanation="test question 2", value=2)
@@ -29,3 +32,13 @@ def test_principle():
     # Not allowed becuase the options should be unique
     with pytest.raises(ValueError):
         _ = Principle(question="This principle is not allowed", options=[option1, option1, option2])
+
+def test_yaml_loader():
+    yaml_path = Path(__file__).parent / "test_principles.yaml"
+    principles = yaml_loader(yaml_path)
+    assert all([isinstance(p, Principle) for p in principles])
+    
+    principle1, principle2 = principles[0], principles[1]
+    assert principle1.question == "This is a test principle"
+    assert principle2.question == "This is a second test principle"
+    assert principle1.options[1].explanation == "Option 2"
