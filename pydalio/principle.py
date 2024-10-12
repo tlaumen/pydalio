@@ -20,23 +20,23 @@ class Principle:
 
     @property
     def _option_ids(self):
-        return [_.id_ for _ in self.options]
+        ids = [_.id_ for _ in self.options]
+        return ids
 
     def __post_init__(self):
+        self.options.sort(key=lambda x:x.id_) # Sort the options to be sure they are shown in correct order and checks work
+
         if len(self.options) == 0:
             raise ValueError("No options are input, there should be at least 1 option given!")
 
-        ids = self._option_ids
-        ids.sort()
-
-        if ids[0] != 1:
-            raise ValueError(f"One id values of principe object {self} options should be 1.")
+        if self._option_ids[0] != 1:
+            raise ValueError(f"One id values of principle object {self} options should be 1.")
         
-        for id1, id2 in pairwise(ids):
+        for id1, id2 in pairwise(self._option_ids):
             if id2 - id1 != 1:
-                raise ValueError(f"All option id's should be adjacent numbers, i.e. 1, 2, 3, .... Instead, they are: {ids}")
+                raise ValueError(f"All option id's should be adjacent numbers, i.e. 1, 2, 3, .... Instead, they are: {self._option_ids}")
         
-        for id1, id2 in combinations(ids, 2):
+        for id1, id2 in combinations(self._option_ids, 2):
             if id1 == id2:
                 raise ValueError(f"All option should be unique. They are however: {self.options}")
     
@@ -53,9 +53,9 @@ class Principle:
         text = self.question 
         for option in self.options:
             text += f"\n\t{option}"
-        text += f"\nSelect your option by providing one the corresponding number: {[_.id_ for _ in self.options]}"
+        text += f"\nSelect your option by providing one the corresponding number: {self._option_ids}"
         valid_response: bool = False
         while not valid_response:
-            response: int = typer.prompt(text,type=int, show_choices=[_.id_ for _ in self.options])
+            response: int = typer.prompt(text, type=int)
             valid_response = self._is_response_valid(response)
         return response
