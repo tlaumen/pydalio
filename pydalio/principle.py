@@ -18,11 +18,15 @@ class Principle:
     question: str
     options: list[Option]
 
+    @property
+    def _option_ids(self):
+        return [_.id_ for _ in self.options]
+
     def __post_init__(self):
         if len(self.options) == 0:
             raise ValueError("No options are input, there should be at least 1 option given!")
 
-        ids = [option.id_ for option in self.options]
+        ids = self._option_ids
         ids.sort()
 
         if ids[0] != 1:
@@ -36,9 +40,22 @@ class Principle:
             if id1 == id2:
                 raise ValueError(f"All option should be unique. They are however: {self.options}")
     
-    def echo(self):
+    def _is_response_valid(self, response: int) -> bool:
+        if not response in self._option_ids:
+            msg = f"\nThe value {response} is not a valid response. Please enter one of the following responses: {self._option_ids}\n"
+            styled_msg = typer.style(msg, fg=typer.colors.RED)
+            typer.echo(styled_msg)
+            return False
+        return True
+
+    def prompt(self):
         """Presents questions and options with typer for user input"""
-        str_ = self.question 
+        text = self.question 
         for option in self.options:
-            str_ += f"\n{option}"
-        typer.echo(str_)
+            text += f"\n\t{option}"
+        text += f"\nSelect your option by providing one the corresponding number: {[_.id_ for _ in self.options]}"
+        valid_response: bool = False
+        while not valid_response:
+            response: int = typer.prompt(text,type=int, show_choices=[_.id_ for _ in self.options])
+            valid_response = self._is_response_valid(response)
+        return response
