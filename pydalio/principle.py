@@ -3,6 +3,7 @@ from typing import Optional
 from itertools import pairwise
 from itertools import combinations
 from pathlib import Path
+from copy import copy
 
 import typer
 import yaml
@@ -50,17 +51,35 @@ class Principle:
             return False
         return True
 
-    def prompt(self):
-        """Presents questions and options with typer for user input"""
-        text = self.question 
+    def _create_prompt_text(self) -> str:
+        # Prompt text starts with the question/statement
+        text = copy(self.question) 
+        
+        # Text could be a question or a statement. In case it is a statement, add colon for nicer layout
+        if self.question[-1] != "?":
+            text += ":"
+
+        # Add all options to text
         for option in self.options:
             text += f"\n\t{option}"
+        
+        # Add explanation what to do
         text += f"\nSelect your option by providing one the corresponding number: {self._option_ids}"
+        return text
+
+    def prompt(self):
+        """Presents questions and options with typer for user input"""
         valid_response: bool = False
         while not valid_response:
-            response: int = typer.prompt(text, type=int)
+            response: int = typer.prompt(self._create_prompt_text(), type=int)
             valid_response = self._is_response_valid(response)
         return response
+    
+    def get_option_str_from_id(self, id_: int) -> str:
+        option_mapping: dict[int, str] = {option.id_: option.explanation for option in self.options}
+        if id_ not in option_mapping:
+            raise ValueError(f"The requested id is a valid option with principle: {self}")
+        return option_mapping[id_]
 
 def _principle_factory(dict_: dict[str, list[str]]) -> list[Principle]:
     """Gets principles as keys and options as values of dictionary"""
