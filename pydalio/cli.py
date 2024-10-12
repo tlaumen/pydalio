@@ -1,24 +1,14 @@
-from typing import Optional
-
 import typer
 
+from pydalio.principle import Principle
+from pydalio.principle import Option
+
 app = typer.Typer()
-
-
-@app.command()
-def hello(name: Optional[str] = None):
-    if name:
-        typer.echo(f"Hello {name}")
-    else:
-        typer.echo("Hello World!")
-
+principle1 = Principle("Principle 1: ...", options=[Option(id_=1, explanation="This is the first option")])
 
 @app.command()
-def bye(name: Optional[str] = None):
-    if name:
-        typer.echo(f"Bye {name}")
-    else:
-        typer.echo("Goodbye!")
+def principles_check():
+    principle1.echo()
 
 
 if __name__ == "__main__":
