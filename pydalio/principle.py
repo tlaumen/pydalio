@@ -96,5 +96,4 @@ def _principle_factory(dict_: dict[str, list[str]]) -> list[Principle]:
 def yaml_loader(path: Path) -> list[Principle]:
     with open(path) as f:
         dict_ = yaml.safe_load(f)
-    print(dict_)
     return _principle_factory(dict_)
