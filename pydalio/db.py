@@ -27,6 +27,7 @@ def initiliaze_tables(db_path: Path, principles: list[Principle]):
                 _fill_principle_table(conn, p, i)
             conn.commit()
 
+
 def _create_principles_table_query(principles: list[Principle]) -> str:
     """Creates query to create table with all principles results"""
     create_table_query: str = "CREATE TABLE principles(id INTEGER PRIMARY KEY, case_ TEXT NOT NULL, "
@@ -54,21 +55,33 @@ def _create_principle_table(db_conn, principle: Principle, id_: int):
     """Creates a table for a principle containing the principle and all options"""
     db_conn.cursor().execute(_create_principle_table_query(id_, principle))
 
+def _add_encapsuling_apostrophe(text: str) -> str:
+    """
+    Encapsulates string with apostrophes
+    Example: This is a sentence -> 'This is a sentence'
+    """
+    return f"'{text}'"
+
+def _add_row_to_table_query(table: str, columns: list[str], values: list[str]) -> str:
+    """Base function to add row to table"""
+    if len(values) != len(columns):
+        raise ValueError(f"The columns and values have different lengths. This cannot be the case.\nColumns: {columns}\nValues: {values}")
+    
+    # Encapsulate strings with spaces with apostrophe for sqlite command
+    columns_: list[str] = [_add_encapsuling_apostrophe(c) if " " in c else c for c in columns]
+    values_: list[str] = [_add_encapsuling_apostrophe(v) if " " in v else v for v in values]
+    return f"INSERT INTO {table} ({', '.join(columns_)}) VALUES ({', '.join(values_)})"
+    
 def _fill_principle_query(id_: int, principle: Principle) -> str:
-    """Creates query to create table for principle with all possible options"""
-    insert_principle_query: str = f"INSERT INTO principle{id_} (id, question, "
-    for i in range(1, len(principle.options)+1):
-        insert_principle_query += f"option{i}"
-        insert_principle_query += ", " if i != len(principle.options) else ""
-    insert_principle_query += ") VALUES ("
-    insert_principle_query += f"{id_}, "
-    insert_principle_query += f"'{principle.question}', "
-    for i, option in enumerate(principle.options, start=1):
-        insert_principle_query += f"'{option.explanation}'" 
-        insert_principle_query += ", " if i != len(principle.options) else ""
-    insert_principle_query += ")"
-    return insert_principle_query
+    """Creates query to fill table for principle"""
+    table: str = f"principle{id_}"
+    columns: list[str] = ["id", "question"] + [f"option{i}" for i in range(1, len(principle.options)+1)]
+    values: list[str] = [f"{id_}", principle.question] + [option.explanation for option in principle.options]
+    return _add_row_to_table_query(table=table, columns=columns, values=values)
 
 def _fill_principle_table(db_conn, principle: Principle, id_: int):
     """Fills the principle table with the information of a principle"""
     db_conn.cursor().execute(_fill_principle_query(id_, principle))
+
+def _add_row_to_principles_table():
+    pass
