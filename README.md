@@ -5,7 +5,7 @@ Development track:
 
 [x] create cli application basis
 [ ] create orchestrating logic to run continuously
-[ ] create sqllite db interface
+[x] create sqllite db interface
 [x] create generalised principle questions interface
 [ ] create simple algorithm interface based on database.First guesstimate is decision tree algorithm or logistic regression.
 
