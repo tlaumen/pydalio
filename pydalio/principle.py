@@ -4,9 +4,15 @@ from itertools import pairwise
 from itertools import combinations
 from pathlib import Path
 from copy import copy
+from enum import Enum
 
 import typer
 import yaml
+
+class ResultType(Enum):
+    TEXT = 0
+    INTEGER = 1
+
 
 @dataclass
 class Option:
@@ -20,6 +26,7 @@ class Option:
 class Principle:
     question: str
     options: list[Option]
+    result_type: ResultType = ResultType.TEXT # sets db value
 
     @property
     def _option_ids(self):
@@ -94,6 +101,8 @@ def _principle_factory(dict_: dict[str, list[str]]) -> list[Principle]:
     return principles
 
 def yaml_loader(path: Path) -> list[Principle]:
+    if not path.exists():
+        raise ValueError(f"The path {path} to the .yaml file does not exist!")
     with open(path) as f:
         dict_ = yaml.safe_load(f)
     return _principle_factory(dict_)
