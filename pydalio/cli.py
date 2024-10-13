@@ -37,7 +37,8 @@ def check_principles():
         response_id = p.prompt()
         responses.append(p.get_option_str_from_id(response_id))
         typer.echo("\n") # Create a single line of space around the prompts
-    #TODO: give overview of what user has filled in to confirm BEFORE entry in database
+    # TODO: give overview of what user has filled in to confirm BEFORE entry in database
+    # TODO: ask on final decision what the decision is you are going to do
     add_row_to_principles_table(principles, responses)
 
 @app.command()
