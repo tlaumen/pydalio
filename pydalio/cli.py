@@ -32,7 +32,6 @@ def check_principles():
         response_id = p.prompt()
         responses.append(p.get_option_str_from_id(response_id))
         typer.echo("\n") # Create a single line of space around the prompts
-    print(responses)
 
 @app.command()
 def overview():

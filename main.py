@@ -14,4 +14,4 @@ create_db(Path(__file__).parent)
 initiliaze_tables(db_path=db_path, principles=yaml_loader(Path(__file__).parent / "example_principles.yaml"))
 # app()
 # finally:
-#     os.remove(db_path)
+#     os.remove(db_path

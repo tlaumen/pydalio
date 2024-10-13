@@ -31,7 +31,7 @@ def initiliaze_tables(db_path: Path, principles: list[Principle]):
 
 def _create_principles_table_query(principles: list[Principle]) -> str:
     """Creates query to create table with all principles results"""
-    create_table_query: str = "CREATE TABLE principles(principle_id INT PRIMARY KEY, case_ STRING NOT NULL, "
+    create_table_query: str = "CREATE TABLE principles(id INTEGER PRIMARY KEY, case_ TEXT NOT NULL, "
     for i, p in enumerate(principles, start=1):
         create_table_query += f"principle{i} {p.result_type.name} NOT NULL" 
         create_table_query += ", " if i != len(principles) else ""
@@ -45,7 +45,7 @@ def _create_principles_table(db_conn, principles: list[Principle]):
 def _create_principle_table_query(id_: int, principle: Principle) -> str:
     """Creates query to create table for principle with all possible options"""
     create_table_query: str = f"CREATE TABLE principle{id_}(id INTEGER, "
-    create_table_query += "question STRING NOT NULL, "
+    create_table_query += "question TEXT NOT NULL, "
     for i in range(1, len(principle.options)+1):
         create_table_query += f"option{i} {principle.result_type.name} NOT NULL" 
         create_table_query += ", " if i != len(principle.options) else ""
