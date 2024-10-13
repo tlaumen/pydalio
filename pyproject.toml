@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "pydalio"
 version = "0.1.0"
-description = ""
-authors = ["Tom Laumen <tom.laumen@boskalis.com>"]
+description = "A package to help with testing of principles in decision making"
+authors = ["Tom Laumen <tom_laumen@hotmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
