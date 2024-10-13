@@ -27,15 +27,19 @@ def initiliaze_tables(db_path: Path, principles: list[Principle]):
                 _fill_principle_table(conn, p, i)
             conn.commit()
 
+def from_principle_to_db_col(principle: Principle, all_principles: list[Principle]) -> str:
+    """Creates appropriate column name for principle for principles table"""
+    if principle not in all_principles:
+        raise ValueError(f"The provided principle: {principle} is not in the list of all principles:{principles}. Please make sure this is the case!")
+    for i, p in enumerate(all_principles, start=1):
+        if p == principle:
+            return f"principle{i}"
 
 def _create_principles_table_query(principles: list[Principle]) -> str:
     """Creates query to create table with all principles results"""
-    create_table_query: str = "CREATE TABLE principles(id INTEGER PRIMARY KEY, case_ TEXT NOT NULL, "
-    for i, p in enumerate(principles, start=1):
-        create_table_query += f"principle{i} {p.result_type.name} NOT NULL" 
-        create_table_query += ", " if i != len(principles) else ""
-    create_table_query += ")"
-    return create_table_query
+    principle_columns: list[str] = [f"{from_principle_to_db_col(p, principles)} {p.result_type.name} NOT NULL" for p in principles]
+    return f"CREATE TABLE principles(case_ TEXT NOT NULL, {', '.join(principle_columns)})"
+
 
 def _create_principles_table(db_conn, principles: list[Principle]):
     """Creates table that stores all principles results"""
@@ -43,13 +47,8 @@ def _create_principles_table(db_conn, principles: list[Principle]):
 
 def _create_principle_table_query(id_: int, principle: Principle) -> str:
     """Creates query to create table for principle with all possible options"""
-    create_table_query: str = f"CREATE TABLE principle{id_}(id INTEGER, "
-    create_table_query += "question TEXT NOT NULL, "
-    for i in range(1, len(principle.options)+1):
-        create_table_query += f"option{i} {principle.result_type.name} NOT NULL" 
-        create_table_query += ", " if i != len(principle.options) else ""
-    create_table_query += ")"
-    return create_table_query
+    option_columns: list[str] = [f"option{i} {principle.result_type.name} NOT NULL" for i in range(1, len(principle.options)+1)]
+    return f"CREATE TABLE principle{id_}(question TEXT NOT NULL, {', '.join(option_columns)})"
 
 def _create_principle_table(db_conn, principle: Principle, id_: int):
     """Creates a table for a principle containing the principle and all options"""
@@ -75,8 +74,8 @@ def _add_row_to_table_query(table: str, columns: list[str], values: list[str]) -
 def _fill_principle_query(id_: int, principle: Principle) -> str:
     """Creates query to fill table for principle"""
     table: str = f"principle{id_}"
-    columns: list[str] = ["id", "question"] + [f"option{i}" for i in range(1, len(principle.options)+1)]
-    values: list[str] = [f"{id_}", principle.question] + [option.explanation for option in principle.options]
+    columns: list[str] = ["question"] + [f"option{i}" for i in range(1, len(principle.options)+1)]
+    values: list[str] = [principle.question] + [option.explanation for option in principle.options]
     return _add_row_to_table_query(table=table, columns=columns, values=values)
 
 def _fill_principle_table(db_conn, principle: Principle, id_: int):
@@ -84,4 +83,5 @@ def _fill_principle_table(db_conn, principle: Principle, id_: int):
     db_conn.cursor().execute(_fill_principle_query(id_, principle))
 
 def _add_row_to_principles_table():
+    """Gets the user input of principle and inputs it into the db"""
     pass
