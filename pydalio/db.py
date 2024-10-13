@@ -1,12 +1,10 @@
 from pathlib import Path
 import sqlite3
-import os
 from contextlib import closing
 
-from pydalio.principle import Principle, yaml_loader
-from pydalio.constants import DB_NAME, YAML_PATH_ENV_VARIABLE_KEY
+from pydalio.principle import Principle
+from pydalio.constants import DB_NAME
 from pydalio.utils import setup_environment
-from pydalio.constants import DB_PATH_ENV_VARIABLE_KEY
 
 def create_db(db_folder: Path):
     conn = sqlite3.connect(db_folder / DB_NAME)
