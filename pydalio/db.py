@@ -3,15 +3,17 @@ import sqlite3
 from contextlib import closing
 import os
 
-from pydalio.principle import Principle
-from pydalio.constants import DB_NAME, DB_PATH_ENV_VAR, PRINCIPLES_TABLE_NAME
+from pydalio.principle import Principle, yaml_loader
+from pydalio.constants import DB_NAME, DB_PATH_ENV_VAR, PRINCIPLES_TABLE_NAME, YAML_PATH_ENV_VAR
 from pydalio.utils import setup_environment
 
-def create_db(db_folder: Path):
-    conn = sqlite3.connect(db_folder / DB_NAME)
+def create_db():
+    setup_environment()
+    db_path = Path(os.getenv(DB_PATH_ENV_VAR)) / DB_NAME 
+    conn = sqlite3.connect(db_path)
     conn.close()
 
-def initiliaze_tables(principles: list[Principle]):
+def initiliaze_tables():
     """
     Creates a few tables: 
         - 1 table to track all results entered
@@ -19,8 +21,12 @@ def initiliaze_tables(principles: list[Principle]):
     """
     setup_environment()
 
+    # Load principles from .yaml file
+    principles: list[Principle] = yaml_loader(Path(os.getenv(YAML_PATH_ENV_VAR)))
+
     # Based on https://martinheinz.dev/blog/34
-    with closing(sqlite3.connect(os.getenv(DB_PATH_ENV_VAR))) as conn:
+    db_path = Path(os.getenv(DB_PATH_ENV_VAR)) / DB_NAME 
+    with closing(sqlite3.connect(db_path)) as conn:
         with conn:
             _create_principles_table(conn, principles)
             for p in principles:
@@ -91,7 +97,8 @@ def add_row_to_principles_table(principles: list[Principle], responses: list[str
     columns: list[str] = ["case_"] + [from_principle_to_db_col(p, principles) for p in principles]
     values: list[str] = responses
     
-    with closing(sqlite3.connect(os.getenv(DB_PATH_ENV_VAR))) as conn:
+    db_path = Path(os.getenv(DB_PATH_ENV_VAR)) / DB_NAME 
+    with closing(sqlite3.connect(db_path)) as conn:
         with conn:
             conn.cursor().execute(_add_row_to_table_query(table, columns, values))
             conn.commit()
