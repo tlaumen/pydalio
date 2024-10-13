@@ -5,11 +5,11 @@ import os
 import typer
 from dotenv import load_dotenv
 
-from pydalio.constants import DB_PATH_ENV_VARIABLE_KEY, YAML_PATH_ENV_VARIABLE_KEY
+from pydalio.constants import DB_PATH_ENV_VAR, YAML_PATH_ENV_VAR
 
 
 def setup_environment():
-    if DB_PATH_ENV_VARIABLE_KEY not in os.environ or YAML_PATH_ENV_VARIABLE_KEY not in os.environ:
+    if DB_PATH_ENV_VAR not in os.environ or YAML_PATH_ENV_VAR not in os.environ:
         logging.info("Environment variables are not yet set")
         path_env_vars = typer.prompt("The environment variables for the DB and principles yaml are not yet set.\nWhat is the path to the environment variables?", type=str)
         typer.echo("\n")

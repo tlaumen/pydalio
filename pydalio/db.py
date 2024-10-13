@@ -1,16 +1,17 @@
 from pathlib import Path
 import sqlite3
 from contextlib import closing
+import os
 
 from pydalio.principle import Principle
-from pydalio.constants import DB_NAME, PRINCIPLES_TABLE_NAME
+from pydalio.constants import DB_NAME, DB_PATH_ENV_VAR, PRINCIPLES_TABLE_NAME
 from pydalio.utils import setup_environment
 
 def create_db(db_folder: Path):
     conn = sqlite3.connect(db_folder / DB_NAME)
     conn.close()
 
-def initiliaze_tables(db_path: Path, principles: list[Principle]):
+def initiliaze_tables(principles: list[Principle]):
     """
     Creates a few tables: 
         - 1 table to track all results entered
@@ -19,7 +20,7 @@ def initiliaze_tables(db_path: Path, principles: list[Principle]):
     setup_environment()
 
     # Based on https://martinheinz.dev/blog/34
-    with closing(sqlite3.connect(db_path)) as conn:
+    with closing(sqlite3.connect(os.getenv(DB_PATH_ENV_VAR))) as conn:
         with conn:
             _create_principles_table(conn, principles)
             for p in principles:
@@ -37,6 +38,8 @@ def from_principle_to_db_col(principle: Principle, all_principles: list[Principl
 def _create_principles_table_query(principles: list[Principle]) -> str:
     """Creates query to create table with all principles results"""
     principle_columns: list[str] = [f"{from_principle_to_db_col(p, principles)} {p.result_type.name} NOT NULL" for p in principles]
+    # TODO: add date and time of response in database --> important data on decision moment!
+    # TODO: add final decision to database: YES/NO/POSTPONE 
     return f"CREATE TABLE {PRINCIPLES_TABLE_NAME}(case_ TEXT NOT NULL, {', '.join(principle_columns)})"
 
 def _create_principles_table(db_conn, principles: list[Principle]):
@@ -87,5 +90,12 @@ def add_row_to_principles_table(principles: list[Principle], responses: list[str
     table: str = PRINCIPLES_TABLE_NAME
     columns: list[str] = ["case_"] + [from_principle_to_db_col(p, principles) for p in principles]
     values: list[str] = responses
+    
+    with closing(sqlite3.connect(os.getenv(DB_PATH_ENV_VAR))) as conn:
+        with conn:
+            conn.cursor().execute(_add_row_to_table_query(table, columns, values))
+            conn.commit()
+
+
     
     

@@ -1,6 +1,6 @@
 # Environment variables
-YAML_PATH_ENV_VARIABLE_KEY: str = "YAML_PATH"
-DB_PATH_ENV_VARIABLE_KEY: str = "DB_PATH"
+YAML_PATH_ENV_VAR: str = "YAML_PATH"
+DB_PATH_ENV_VAR: str = "DB_PATH"
 
 # Database related constants
 DB_NAME = "dalio.db"
