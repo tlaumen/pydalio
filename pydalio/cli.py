@@ -8,6 +8,8 @@ from pydalio.constants import MAX_LEN_CASE_DESCR, YAML_PATH_ENV_VAR
 from pydalio.db import add_row_to_principles_table
 from pydalio.principle import yaml_loader
 from pydalio.utils import setup_environment
+from pydalio.db import create_db
+from pydalio.db import initiliaze_tables
 
 
 logging.basicConfig(
@@ -21,6 +23,7 @@ app = typer.Typer()
 
 @app.command()
 def check_principles():
+    """Perfom a check of your principles on a case you are facing"""
     # Load the principles through the .yaml file
     #TODO: for future make .env file optional and add .yaml file / db file as options
     setup_environment()
@@ -44,7 +47,8 @@ def check_principles():
 @app.command()
 def initial_setup():
     """Initial setup to create database with correct structure and load principles into database"""
-    pass
+    create_db()
+    initiliaze_tables()
 
 @app.command()
 def overview():
